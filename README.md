@@ -127,3 +127,9 @@ StudyGarden은 사용자가 과제를 진행할수록 가상의 식물이 자라
 
 -  단기적 목표 달성시 작은 성취감 그로인해서 식물이 성장하게 되고 그로인한 행복감
 -  과제를 할 수록 시각적인 보상 제공 
+
+
+
+
+# 순서도
+<img width="459" alt="image" src="https://github.com/user-attachments/assets/6a19306e-bac7-499b-9479-2cf402460838" />
