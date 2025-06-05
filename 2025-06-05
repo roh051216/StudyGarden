@@ -1,0 +1,67 @@
+# 2025-06-05 StudyGarden 부분 수정 코드
+
+  - 타이머 구현 
+   private void startTimer() {
+        elapsedSeconds = 0;  // 타이머 재시작 시 초기화
+
+        timer = new Timer(1000, new ActionListener() { // 1000ms = 1초
+            public void actionPerformed(ActionEvent e) {
+                elapsedSeconds++;
+
+                // 상태 변화 예시
+                if (elapsedSeconds == 10) {
+                    plantStatusLabel.setText("🌿 현재 상태: 새싹");
+                } else if (elapsedSeconds == 20) {
+                    plantStatusLabel.setText("🌳 현재 상태: 나무");
+                }
+
+                // 디버깅용 출력
+                System.out.println("타이머: " + elapsedSeconds + "초");
+            }
+        });
+
+        timer.start();
+        JOptionPane.showMessageDialog(this, "타이머가 시작되었습니다!");
+    }
+
+
+    
+
+    - 구현했지만 GUI에 뜨질않고 intelij 런에 뜨기에 GUI에 뜨게끔 코드 수정 및 
+    
+     private void startTimer() {
+        elapsedSeconds = 0;
+
+        if (timer != null && timer.isRunning()) {
+            timer.stop();  // 중복 실행 방지
+        }
+
+        timer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                elapsedSeconds++;
+                timerLabel.setText("⏱ 경과 시간: " + elapsedSeconds + "초");
+
+                // 식물 상태 변경
+                if (elapsedSeconds == 10) {
+                    plantStatusLabel.setText("🌿 현재 상태: 새싹");
+                } else if (elapsedSeconds == 20) {
+                    plantStatusLabel.setText("🌳 현재 상태: 나무");
+                }
+            }
+        });
+
+
+
+## 미구현 부분 및 추가 로직
+
+------미구현 부분------
+로그인/사용자 인증
+타이머 중단/일시정지/리셋
+과제 마감일 및 예상 시간 설정
+집중 포인트 누적
+포인트에 따른 식물 성장
+식물 이미지 표시 및 변화
+방치 상태 가밎
+회복 모드
+세션 종료 후 통계 출력
+데이터 저장 및 불러오기
