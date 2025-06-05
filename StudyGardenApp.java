@@ -7,6 +7,10 @@ public class StudyGardenApp extends JFrame {
     private JTextField taskTitleField;
     private JButton startButton;
     private JLabel plantStatusLabel;
+    private JLabel timerLabel;         // ⏱ 타이머 라벨
+
+    private Timer timer;
+    private int elapsedSeconds = 0;
 
     public StudyGardenApp() {
         setTitle("StudyGarden 🌱");
@@ -20,8 +24,7 @@ public class StudyGardenApp extends JFrame {
     }
 
     private void initUI() {
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new GridLayout(3, 2));
+        JPanel topPanel = new JPanel(new GridLayout(3, 2));
 
         topPanel.add(new JLabel("닉네임:"));
         nicknameField = new JTextField();
@@ -32,23 +35,50 @@ public class StudyGardenApp extends JFrame {
         topPanel.add(taskTitleField);
 
         startButton = new JButton("시작하기");
-        // TODO: 타이머 시작 및 포인트 누적 로직 연결 예정
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 타이머 시작 기능 구현 예정
-                JOptionPane.showMessageDialog(null, "타이머 시작 (미구현)");
+                startTimer();
             }
         });
 
         topPanel.add(startButton);
-
         add(topPanel, BorderLayout.NORTH);
 
-        // 식물 상태를 표시할 공간
-        plantStatusLabel = new JLabel("🌱 현재 상태: 씨앗", SwingConstants.CENTER);
-        add(plantStatusLabel, BorderLayout.CENTER);
+        // 중앙 패널에 타이머 + 식물 상태 표시
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1));
 
-        // TODO: 타이머, 포인트, 식물 성장 상태 업데이트 기능 추가
+        timerLabel = new JLabel("⏱ 경과 시간: 0초", SwingConstants.CENTER);
+        centerPanel.add(timerLabel);
+
+        plantStatusLabel = new JLabel("🌱 현재 상태: 씨앗", SwingConstants.CENTER);
+        centerPanel.add(plantStatusLabel);
+
+        add(centerPanel, BorderLayout.CENTER);
+    }
+
+    private void startTimer() {
+        elapsedSeconds = 0;
+
+        if (timer != null && timer.isRunning()) {
+            timer.stop();  // 중복 실행 방지
+        }
+
+        timer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                elapsedSeconds++;
+                timerLabel.setText("⏱ 경과 시간: " + elapsedSeconds + "초");
+
+                // 식물 상태 변경
+                if (elapsedSeconds == 10) {
+                    plantStatusLabel.setText("🌿 현재 상태: 새싹");
+                } else if (elapsedSeconds == 20) {
+                    plantStatusLabel.setText("🌳 현재 상태: 나무");
+                }
+            }
+        });
+
+        timer.start();
+        JOptionPane.showMessageDialog(this, "타이머가 시작되었습니다!");
     }
 
     public static void main(String[] args) {
