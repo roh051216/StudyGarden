@@ -16,6 +16,9 @@ StudyGarden은 사용자가 과제를 진행할수록 가상의 식물이 자라
 
 -  성취감을 누릴 수 있는 자기관리 도구가 필요하기에 선정
 
+# 순서도
+<img width="459" alt="image" src="https://github.com/user-attachments/assets/6a19306e-bac7-499b-9479-2cf402460838" />
+
 
 # 개발 방법
 
@@ -216,5 +219,3 @@ class LoginDialog extends JDialog {
 -  과제를 할 수록 시각적인 보상 제공
 
 
-# 순서도
-<img width="459" alt="image" src="https://github.com/user-attachments/assets/6a19306e-bac7-499b-9479-2cf402460838" />
