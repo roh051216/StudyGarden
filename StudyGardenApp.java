@@ -11,7 +11,10 @@ public class StudyGardenApp extends JFrame {
     private JLabel timerLabel;
 
     private Timer timer;
+    private Timer idleTimer;
     private int elapsedSeconds = 0;
+    private boolean isIdle = false;
+    private final int IDLE_TIMEOUT = 30; // 30초
 
     public StudyGardenApp() {
         setTitle("StudyGarden 🌱");
@@ -20,8 +23,9 @@ public class StudyGardenApp extends JFrame {
         setLayout(new BorderLayout());
 
         initUI();
+        initIdleDetection();
 
-        setVisible(true);
+        setVisible(false); // 로그인 성공 전까지는 숨김
     }
 
     private void initUI() {
@@ -50,23 +54,14 @@ public class StudyGardenApp extends JFrame {
         startButton.setBackground(new Color(150, 200, 150));
         startButton.setForeground(Color.BLACK);
         startButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                startTimer();
-            }
-        });
+        startButton.addActionListener(e -> startTimer());
         topPanel.add(startButton);
 
-        // 종료 버튼 추가
         stopButton = new JButton("🛑 종료하기");
         stopButton.setBackground(new Color(200, 100, 100));
         stopButton.setForeground(Color.WHITE);
         stopButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        stopButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                stopTimer();
-            }
-        });
+        stopButton.addActionListener(e -> stopTimer());
         topPanel.add(stopButton);
 
         backgroundPanel.add(topPanel, BorderLayout.NORTH);
@@ -90,21 +85,19 @@ public class StudyGardenApp extends JFrame {
         elapsedSeconds = 0;
 
         if (timer != null && timer.isRunning()) {
-            timer.stop();  // 재시작 시 기존 타이머 중단
+            timer.stop();
         }
 
-        timer = new Timer(1000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                elapsedSeconds++;
-                timerLabel.setText("⏱ 경과 시간: " + elapsedSeconds + "초");
+        timer = new Timer(1000, e -> {
+            elapsedSeconds++;
+            timerLabel.setText("⏱ 경과 시간: " + elapsedSeconds + "초");
 
-                if (elapsedSeconds == 10) {
-                    plantStatusLabel.setText("🌿 현재 상태: 새싹");
-                    plantStatusLabel.setForeground(new Color(34, 139, 34));
-                } else if (elapsedSeconds == 20) {
-                    plantStatusLabel.setText("🌳 현재 상태: 나무");
-                    plantStatusLabel.setForeground(new Color(0, 100, 0));
-                }
+            if (elapsedSeconds == 10) {
+                plantStatusLabel.setText("🌿 현재 상태: 새싹");
+                plantStatusLabel.setForeground(new Color(34, 139, 34));
+            } else if (elapsedSeconds == 20) {
+                plantStatusLabel.setText("🌳 현재 상태: 나무");
+                plantStatusLabel.setForeground(new Color(0, 100, 0));
             }
         });
 
@@ -119,7 +112,95 @@ public class StudyGardenApp extends JFrame {
         }
     }
 
+    private void updatePlantStatus() {
+        if (elapsedSeconds < 10) {
+            plantStatusLabel.setText("🌱 현재 상태: 씨앗");
+            plantStatusLabel.setForeground(new Color(0, 128, 0));
+        } else if (elapsedSeconds < 20) {
+            plantStatusLabel.setText("🌿 현재 상태: 새싹");
+            plantStatusLabel.setForeground(new Color(34, 139, 34));
+        } else {
+            plantStatusLabel.setText("🌳 현재 상태: 나무");
+            plantStatusLabel.setForeground(new Color(0, 100, 0));
+        }
+    }
+
+    private void resetIdleTimer() {
+        if (isIdle) {
+            isIdle = false;
+            updatePlantStatus();
+        }
+        idleTimer.restart();
+    }
+
+    private void initIdleDetection() {
+        idleTimer = new Timer(IDLE_TIMEOUT * 1000, e -> {
+            isIdle = true;
+            plantStatusLabel.setText("😴 현재 상태: 방치 중");
+            plantStatusLabel.setForeground(Color.GRAY);
+        });
+        idleTimer.setRepeats(false);
+
+        MouseAdapter activityTracker = new MouseAdapter() {
+            public void mousePressed(MouseEvent e) { resetIdleTimer(); }
+            public void mouseMoved(MouseEvent e) { resetIdleTimer(); }
+        };
+        KeyAdapter keyTracker = new KeyAdapter() {
+            public void keyPressed(KeyEvent e) { resetIdleTimer(); }
+        };
+
+        addMouseListener(activityTracker);
+        addMouseMotionListener(activityTracker);
+        addKeyListener(keyTracker);
+        setFocusable(true);
+    }
+
     public static void main(String[] args) {
-        new StudyGardenApp();
+        StudyGardenApp app = new StudyGardenApp();
+        LoginDialog login = new LoginDialog(app);
+        login.setLocationRelativeTo(null);
+        login.setVisible(true);
+
+        if (login.isAuthenticated()) {
+            app.setVisible(true);
+        } else {
+            System.exit(0);
+        }
+    }
+}
+
+class LoginDialog extends JDialog {
+    private boolean authenticated = false;
+
+    public LoginDialog(JFrame parent) {
+        super(parent, "로그인", true);
+        setLayout(new GridLayout(3, 2));
+        setSize(300, 150);
+
+        JLabel userLabel = new JLabel("아이디:");
+        JTextField userField = new JTextField();
+        JLabel passLabel = new JLabel("비밀번호:");
+        JPasswordField passField = new JPasswordField();
+
+        JButton loginButton = new JButton("로그인");
+        loginButton.addActionListener(e -> {
+            String user = userField.getText();
+            String pass = new String(passField.getPassword());
+
+            if (user.equals("user") && pass.equals("1234")) {
+                authenticated = true;
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "로그인 실패!");
+            }
+        });
+
+        add(userLabel); add(userField);
+        add(passLabel); add(passField);
+        add(new JLabel()); add(loginButton);
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 }
