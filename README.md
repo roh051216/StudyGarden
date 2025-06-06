@@ -1,5 +1,5 @@
-<img width="281" alt="image" src="https://github.com/user-attachments/assets/176a0d5e-ee6c-49b7-b9a6-7e40bacf2b66" />
-
+                                            <img width="281" alt="image" src="https://github.com/user-attachments/assets/176a0d5e-ee6c-49b7-b9a6-7e40bacf2b66" />
+        
 # 프로그램 설명
 
 StudyGarden은 사용자가 과제를 진행할수록 가상의 식물이 자라나는 Java 기반 자기관리 애플리케이션입니다.  
