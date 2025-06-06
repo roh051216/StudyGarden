@@ -1,0 +1,27 @@
+# 2025-06-06 구현 코드 부분
+
+1. 타이머 종료 버튼을 추가해서 사용자가 원할 때 타이머를 수동으로 정지할 수 있음
+2. 재시작 로직 구현 - 약간의 리펙토링 필요
+
+
+
+
+JButton stopButton = new JButton("🛑 종료하기");
+stopButton.setBackground(new Color(200, 100, 100));
+stopButton.setForeground(Color.WHITE);
+stopButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+stopButton.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent e) {
+        stopTimer();
+    }
+});
+
+topPanel.add(stopButton);
+
+private void stopTimer() { // 메서드 추가
+    if (timer != null && timer.isRunning()) {
+        timer.stop();
+        JOptionPane.showMessageDialog(this, "⏹ 타이머가 종료되었습니다!");
+    }
+}
+
