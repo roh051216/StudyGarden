@@ -24,6 +24,7 @@ StudyGarden은 사용자가 과제를 진행할수록 가상의 식물이 자라
 3.  타이머가 돌아가는 동안 점수 누적
 4.  누적된 점수에 따라 식물이 성장
 5.  종료 시 결과 요약 및 성취도 표시
+6.  Java swing GUI 라이브러리를 통한 개발
 
 ```java
 import javax.swing.*;
@@ -52,6 +53,38 @@ public class StudyGardenApp extends JFrame {
 #### 입력 화면
 
 - 사용자 로그인 (또는 닉네임 입력)
+```java
+class LoginDialog extends JDialog {
+    private boolean authenticated = false;
+
+    public LoginDialog(JFrame parent) {
+        super(parent, "로그인", true);
+        setLayout(new GridLayout(3, 2));
+        setSize(300, 150);
+
+        JLabel userLabel = new JLabel("아이디:");
+        JTextField userField = new JTextField();
+        JLabel passLabel = new JLabel("비밀번호:");
+        JPasswordField passField = new JPasswordField();
+
+        JButton loginButton = new JButton("로그인");
+        loginButton.addActionListener(e -> {
+            String user = userField.getText();
+            String pass = new String(passField.getPassword());
+
+            if (user.equals("user") && pass.equals("1234")) {
+                authenticated = true;
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "로그인 실패!");
+            }
+        });
+
+        add(userLabel); add(userField);
+        add(passLabel); add(passField);
+        add(new JLabel()); add(loginButton);
+    }
+```
     
 - 과제 등록
     
@@ -69,6 +102,40 @@ public class StudyGardenApp extends JFrame {
 
 - Pomodoro 모드 (25분 집중 + 5분 휴식)  
     또는 사용자 정의 시간 (ex: 50분 집중 / 10분 휴식)
+
+  ```java
+     private void startTimer() {
+        elapsedSeconds = 0;
+
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+        }
+
+        timer = new Timer(1000, e -> {
+            elapsedSeconds++;
+            timerLabel.setText("⏱ 경과 시간: " + elapsedSeconds + "초");
+
+            if (elapsedSeconds == 10) {
+                plantStatusLabel.setText("🌿 현재 상태: 새싹");
+                plantStatusLabel.setForeground(new Color(34, 139, 34));
+            } else if (elapsedSeconds == 20) {
+                plantStatusLabel.setText("🌳 현재 상태: 나무");
+                plantStatusLabel.setForeground(new Color(0, 100, 0));
+            }
+        });
+
+        timer.start();
+        JOptionPane.showMessageDialog(this, "타이머가 시작되었습니다!");
+    }
+
+    private void stopTimer() {
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+            JOptionPane.showMessageDialog(this, "⏹ 타이머가 종료되었습니다!");
+        }
+    }
+
+  ```
     
 
 #### UI 
