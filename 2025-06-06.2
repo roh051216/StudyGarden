@@ -9,7 +9,7 @@
 비밀번호: 1234
 
 로그인 실패 시 앱이 종료됨
-
+```java
 class LoginDialog extends JDialog {
     private boolean authenticated = false;
 
@@ -47,7 +47,7 @@ class LoginDialog extends JDialog {
         return authenticated;
     }
 }
-
+```
 
 2. 방치 상태 감지 기능 (Idle Detection)
 사용자의 활동(마우스 클릭/이동, 키보드 입력)이 없으면 30초 후 방치 상태로 전환됨
