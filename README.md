@@ -1,4 +1,4 @@
-                                            <img width="281" alt="image" src="https://github.com/user-attachments/assets/176a0d5e-ee6c-49b7-b9a6-7e40bacf2b66" />
+ # <img width="281" alt="image" src="https://github.com/user-attachments/assets/176a0d5e-ee6c-49b7-b9a6-7e40bacf2b66" />
         
 # 프로그램 설명
 
