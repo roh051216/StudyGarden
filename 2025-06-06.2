@@ -1,0 +1,149 @@
+2025-06-06 2차 구현
+
+1. 로그인 기능 (LoginDialog 클래스)
+앱 실행 시 먼저 로그인 창이 나타남
+
+아이디와 비밀번호가 일치해야 메인 앱 창이 열림
+
+아이디: user
+비밀번호: 1234
+
+로그인 실패 시 앱이 종료됨
+
+class LoginDialog extends JDialog {
+    private boolean authenticated = false;
+
+    public LoginDialog(JFrame parent) {
+        super(parent, "로그인", true);
+        setLayout(new GridLayout(3, 2));
+        setSize(300, 150);
+
+        JLabel userLabel = new JLabel("아이디:");
+        JTextField userField = new JTextField();
+        JLabel passLabel = new JLabel("비밀번호:");
+        JPasswordField passField = new JPasswordField();
+
+        JButton loginButton = new JButton("로그인");
+
+        loginButton.addActionListener(e -> {
+            String user = userField.getText();
+            String pass = new String(passField.getPassword());
+
+            // 간단한 검증: 아이디 = user, 비번 = 1234
+            if (user.equals("user") && pass.equals("1234")) {
+                authenticated = true;
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "로그인 실패!");
+            }
+        });
+
+        add(userLabel); add(userField);
+        add(passLabel); add(passField);
+        add(new JLabel()); add(loginButton);
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+}
+
+
+2. 방치 상태 감지 기능 (Idle Detection)
+사용자의 활동(마우스 클릭/이동, 키보드 입력)이 없으면 30초 후 방치 상태로 전환됨
+
+방치 시 식물 상태 라벨이 다음과 같이 바뀜:
+현재 상태: 방치 중 (회색 텍스트)
+다시 활동하면 **기존 식물 상태(씨앗/새싹/나무)**로 자동 복귀
+
+public static void main(String[] args) {
+    StudyGardenApp app = new StudyGardenApp();
+    LoginDialog login = new LoginDialog(app);
+    login.setLocationRelativeTo(null);
+    login.setVisible(true);
+
+    if (!login.isAuthenticated()) {
+        System.exit(0);
+    }
+
+    app.setVisible(true);
+}
+
+
+private Timer idleTimer;
+private boolean isIdle = false;
+private final int IDLE_TIMEOUT = 30; // 30초
+
+
+
+ActionListener resetIdle = new ActionListener() {
+    public void actionPerformed(ActionEvent e) {
+        if (!isIdle) {
+            isIdle = true;
+            plantStatusLabel.setText("😴 현재 상태: 방치 중");
+            plantStatusLabel.setForeground(Color.GRAY);
+        }
+    }
+};
+
+idleTimer = new Timer(IDLE_TIMEOUT * 1000, resetIdle);
+idleTimer.setRepeats(false);
+
+MouseAdapter activityTracker = new MouseAdapter() {
+    public void mouseMoved(MouseEvent e) {
+        resetIdleTimer();
+    }
+    public void mousePressed(MouseEvent e) {
+        resetIdleTimer();
+    }
+};
+
+KeyAdapter keyTracker = new KeyAdapter() {
+    public void keyPressed(KeyEvent e) {
+        resetIdleTimer();
+    }
+};
+
+// 모든 컴포넌트에 이벤트 리스너 등록
+addMouseListener(activityTracker);
+addMouseMotionListener(activityTracker);
+addKeyListener(keyTracker);
+setFocusable(true);
+
+
+
+private void resetIdleTimer() {
+    if (isIdle) {
+        isIdle = false;
+        updatePlantStatus(); // 경과 시간에 따른 식물 상태 복귀
+    }
+    idleTimer.restart();
+}
+
+
+
+3. 기존 기능 유지
+타이머 시작/종료 버튼
+
+시작 시 1초마다 시간 증가
+
+10초 경과 시:  새싹
+
+20초 경과 시:  나무
+
+닉네임 입력 및 과제 제목 입력 필드 포함
+
+
+
+private void updatePlantStatus() {
+    if (elapsedSeconds < 10) {
+        plantStatusLabel.setText("🌱 현재 상태: 씨앗");
+        plantStatusLabel.setForeground(new Color(0, 128, 0));
+    } else if (elapsedSeconds < 20) {
+        plantStatusLabel.setText("🌿 현재 상태: 새싹");
+        plantStatusLabel.setForeground(new Color(34, 139, 34));
+    } else {
+        plantStatusLabel.setText("🌳 현재 상태: 나무");
+        plantStatusLabel.setForeground(new Color(0, 100, 0));
+    }
+}
