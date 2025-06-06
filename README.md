@@ -25,6 +25,26 @@ StudyGarden은 사용자가 과제를 진행할수록 가상의 식물이 자라
 4.  누적된 점수에 따라 식물이 성장
 5.  종료 시 결과 요약 및 성취도 표시
 
+```java
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class StudyGardenApp extends JFrame {
+    private JTextField nicknameField;
+    private JTextField taskTitleField;
+    private JButton startButton;
+    private JButton stopButton;
+    private JLabel plantStatusLabel;
+    private JLabel timerLabel;
+
+    private Timer timer;
+    private Timer idleTimer;
+    private int elapsedSeconds = 0;
+    private boolean isIdle = false;
+    private final int IDLE_TIMEOUT = 30; // 30초
+```
+
 # 동작 과정 설명
 
 사용자 시작 단계
@@ -126,9 +146,7 @@ StudyGarden은 사용자가 과제를 진행할수록 가상의 식물이 자라
 # 사용자가 얻을 수 있는 이점은 ? 
 
 -  단기적 목표 달성시 작은 성취감 그로인해서 식물이 성장하게 되고 그로인한 행복감
--  과제를 할 수록 시각적인 보상 제공 
-
-
+-  과제를 할 수록 시각적인 보상 제공
 
 
 # 순서도
