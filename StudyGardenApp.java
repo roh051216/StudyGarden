@@ -1,14 +1,15 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.time.LocalDateTime;
 
 public class StudyGardenApp extends JFrame {
     private JTextField nicknameField;
     private JTextField taskTitleField;
-    private JButton startButton;
-    private JButton stopButton;
-    private JLabel plantStatusLabel;
-    private JLabel timerLabel;
+    private JButton startButton, stopButton, loadButton, deleteButton;
+    private JLabel plantStatusLabel, timerLabel;
 
     private Timer timer;
     private Timer idleTimer;
@@ -18,7 +19,7 @@ public class StudyGardenApp extends JFrame {
 
     public StudyGardenApp() {
         setTitle("StudyGarden 🌱");
-        setSize(400, 300);
+        setSize(400, 350);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -33,36 +34,39 @@ public class StudyGardenApp extends JFrame {
         backgroundPanel.setBackground(new Color(210, 250, 210));
         add(backgroundPanel);
 
-        JPanel topPanel = new JPanel(new GridLayout(3, 2));
+        JPanel topPanel = new JPanel(new GridLayout(4, 2));
         topPanel.setBackground(new Color(200, 240, 200));
 
-        JLabel nicknameLabel = new JLabel("닉네임:");
-        nicknameLabel.setFont(new Font("Serif", Font.PLAIN, 14));
-        topPanel.add(nicknameLabel);
-
+        topPanel.add(new JLabel("닉네임:"));
         nicknameField = new JTextField();
         topPanel.add(nicknameField);
 
-        JLabel taskLabel = new JLabel("과제 제목:");
-        taskLabel.setFont(new Font("Serif", Font.PLAIN, 14));
-        topPanel.add(taskLabel);
-
+        topPanel.add(new JLabel("과제 제목:"));
         taskTitleField = new JTextField();
         topPanel.add(taskTitleField);
 
-        startButton = new JButton("🌼 시작하기");
+        startButton = new JButton("시작하기");
         startButton.setBackground(new Color(150, 200, 150));
-        startButton.setForeground(Color.BLACK);
-        startButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         startButton.addActionListener(e -> startTimer());
         topPanel.add(startButton);
 
-        stopButton = new JButton("🛑 종료하기");
+        stopButton = new JButton("종료하기");
         stopButton.setBackground(new Color(200, 100, 100));
         stopButton.setForeground(Color.WHITE);
-        stopButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         stopButton.addActionListener(e -> stopTimer());
         topPanel.add(stopButton);
+
+        loadButton = new JButton("기록 불러오기");
+        loadButton.setBackground(new Color(100, 150, 200));
+        loadButton.setForeground(Color.WHITE);
+        loadButton.addActionListener(e -> loadStudyRecords());
+        topPanel.add(loadButton);
+
+        deleteButton = new JButton("기록 초기화");
+        deleteButton.setBackground(Color.RED);
+        deleteButton.setForeground(Color.WHITE);
+        deleteButton.addActionListener(e -> deleteStudyRecords());
+        topPanel.add(deleteButton);
 
         backgroundPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -108,7 +112,54 @@ public class StudyGardenApp extends JFrame {
     private void stopTimer() {
         if (timer != null && timer.isRunning()) {
             timer.stop();
+            saveStudyRecord(); // ⬅️ 저장 기능
             JOptionPane.showMessageDialog(this, "⏹ 타이머가 종료되었습니다!");
+        }
+    }
+
+    private void saveStudyRecord() {
+        String nickname = nicknameField.getText();
+        String task = taskTitleField.getText();
+        String date = LocalDateTime.now().toString();
+        String record = nickname + "," + task + "," + elapsedSeconds + "," + date + "\n";
+
+        try (FileWriter writer = new FileWriter("study_log.csv", true)) {
+            writer.write(record);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "기록 저장 실패: " + e.getMessage());
+        }
+    }
+
+    private void loadStudyRecords() {
+        String[] columnNames = {"닉네임", "과제명", "공부시간(초)", "날짜"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("study_log.csv"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 4) model.addRow(data);
+            }
+
+            JTable table = new JTable(model);
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setPreferredSize(new Dimension(350, 200));
+            JOptionPane.showMessageDialog(this, scrollPane, "📚 공부 기록", JOptionPane.PLAIN_MESSAGE);
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "기록을 불러올 수 없습니다: " + e.getMessage());
+        }
+    }
+
+    private void deleteStudyRecords() {
+        int confirm = JOptionPane.showConfirmDialog(this, "정말로 기록을 삭제하시겠습니까?", "기록 초기화", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                new PrintWriter("study_log.csv").close();
+                JOptionPane.showMessageDialog(this, "기록이 삭제되었습니다.");
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "기록 삭제 실패: " + e.getMessage());
+            }
         }
     }
 
@@ -169,6 +220,7 @@ public class StudyGardenApp extends JFrame {
     }
 }
 
+// 로그인 다이얼로그는 변경 없음
 class LoginDialog extends JDialog {
     private boolean authenticated = false;
 
@@ -187,7 +239,7 @@ class LoginDialog extends JDialog {
             String user = userField.getText();
             String pass = new String(passField.getPassword());
 
-            if (user.equals("user") && pass.equals("1234")) {
+            if (user.equals("roh051216") && pass.equals("roh3353012")) {
                 authenticated = true;
                 dispose();
             } else {
