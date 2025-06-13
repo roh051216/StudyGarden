@@ -239,11 +239,11 @@ class LoginDialog extends JDialog {
             String user = userField.getText();
             String pass = new String(passField.getPassword());
 
-            if (user.equals("roh051216") && pass.equals("roh3353012")) {
+            if (user.equals("user") && pass.equals("1111")) {
                 authenticated = true;
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "로그인 실패!");
+                JOptionPane.showMessageDialog(this, "로그인을 실패하였습니다. 다시 시도하시오.");
             }
         });
 
